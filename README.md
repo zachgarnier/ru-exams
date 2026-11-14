@@ -1,3 +1,5 @@
+**Online:** https://zachgarnier.github.io/ru-exams/
+
 # Russian placement tests, TORFL-style (A1 / A2, English or French)
 
 Click-only (no typing, no Cyrillic keyboard). Pick a language, a level, then an exam from the bank.
