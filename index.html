@@ -1,0 +1,113 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Russian placement tests (TORFL-style)</title>
+<style>
+:root{--bg:#fafaf7;--fg:#1d1d1b;--mut:#6b6b66;--card:#fff;--bd:#d8d8d0;--ac:#b3261e}
+@media(prefers-color-scheme:dark){:root{--bg:#161615;--fg:#eeeee8;--mut:#9a9a92;--card:#212120;--bd:#3a3a37;--ac:#ff7a70}}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.5 system-ui,sans-serif}
+main{max-width:640px;margin:0 auto;padding:20px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:20px;margin:14px 0}
+button{font:inherit;color:inherit;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:12px 16px;cursor:pointer;width:100%;text-align:left;margin:6px 0}
+button:hover{border-color:var(--ac)}button.sel{border-color:var(--ac);outline:2px solid var(--ac)}
+button.go{background:var(--ac);color:#fff;text-align:center;border:0}button:disabled{opacity:.5;cursor:default}
+.lv{display:flex;gap:8px;margin-bottom:8px}.lv button{text-align:center}.lv button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.big{font-size:28px;margin:6px 0}.mut{color:var(--mut);font-size:14px}
+.bar{height:6px;background:var(--bd);border-radius:3px}.bar i{display:block;height:100%;background:var(--ac);border-radius:3px}
+.txt{background:var(--bg);border-left:3px solid var(--ac);padding:10px 14px;margin:8px 0}
+.cert{background:#fff;color:#111;border:6px double #b3261e;padding:32px;text-align:center}
+.cert table{width:100%;border-collapse:collapse;margin:18px 0}.cert td{border-bottom:1px solid #ccc;padding:8px;font-size:15px}
+.cert .note{font-size:12px;color:#444;text-align:left;border-top:1px solid #ccc;padding-top:10px;margin-top:18px}
+@media print{:root{--bg:#fff;--fg:#000}.noprint{display:none}body{background:#fff}main{padding:0}}
+</style></head><body><main id="app">Loading…</main>
+<script src="exams/manifest.js"></script>
+<script>
+const $=id=>document.getElementById(id),app=$('app');
+let ui='en',lv,ex,sec,list,i,cur,plays,picked,scr,res={};
+const T=(a,b)=>ui=='fr'?b:a;
+const Ls=s=>{const p=String(s).split('||');return ui=='fr'&&p.length>1?p[1]:p[0]};   // "english||français"
+const SEC={vg:['Vocabulary & Grammar','Lexique et grammaire','vg'],rd:['Reading','Lecture','reading'],li:['Listening','Compréhension orale','listening']};
+const sn=s=>T(SEC[s][0],SEC[s][1]);
+const TFN={A1:['Elementary (ТЭУ)','Élémentaire (ТЭУ)'],A2:['Basic (ТБУ)','Basique (ТБУ)']};
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+// In exam files the FIRST option is always the correct one; options are shuffled here.
+const prep=(l,sh=true)=>(sh?shuf(l):l).map(x=>({...x,opts:shuf(x.o.map((t,i)=>({t,ok:!i})))}));
+const INS=()=>({v:T('Choose the correct match.','Choisissez la bonne correspondance.'),g:T('Choose the word or phrase that completes the sentence.','Choisissez le mot ou l\'expression qui complète la phrase.'),r:T('Read the text, then answer.','Lisez le texte, puis répondez.'),tf:T('Read the text. Is the statement true or false?','Lisez le texte. L\'affirmation est-elle vraie ou fausse ?')});
+
+function speak(t){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='ru-RU';u.rate=.85;
+ const v=speechSynthesis.getVoices().find(v=>v.lang.toLowerCase().startsWith('ru'));if(v)u.voice=v;speechSynthesis.speak(u)}
+function sayIt(it){const a=new Audio('audio/'+ex.id+'/'+String(it.n).padStart(2,'0')+'.mp3');a.play().catch(()=>speak(it.say))}
+const langBar=()=>`<div class="lv"><button class="${ui=='en'?'on':''}" onclick="setUi('en')">English</button><button class="${ui=='fr'?'on':''}" onclick="setUi('fr')">Français</button></div>`;
+function setUi(u){ui=u;scr()}
+
+function home(){scr=home;app.innerHTML=langBar()+`<h1>${T('Russian placement tests','Tests de niveau de russe')}</h1>
+<p class="mut">${T('Modelled on the TORFL (ТРКИ). Multiple choice only: no typing, no Cyrillic keyboard needed.','Inspirés du TORFL (ТРКИ). QCM uniquement : aucune saisie, pas besoin de clavier cyrillique.')}</p>
+<div class="card"><button class="go" onclick="bank('A1')">A1 · ${T('Elementary','Élémentaire')} (ТЭУ)</button><button class="go" onclick="bank('A2')">A2 · ${T('Basic','Basique')} (ТБУ)</button></div>`}
+
+function bank(l){lv=l;scr=()=>bank(l);const xs=EXAMS.filter(e=>e.level==l);
+ app.innerHTML=langBar()+`<button onclick="home()">← ${T('Back','Retour')}</button><h1>${l} · ${T(TFN[l][0],TFN[l][1])}</h1>`+
+ (xs.length?xs.map(e=>`<div class="card"><b>${Ls(e.title)}</b><p class="mut">${e.vg.length+e.reading.length+e.listening.length} questions</p><button class="go" onclick="openEx('${e.id}')">${T('Open','Ouvrir')}</button></div>`).join(''):`<p>${T('No exam found for this level.','Aucun examen pour ce niveau.')}</p>`)}
+
+function openEx(id){ex=EXAMS.find(e=>e.id==id);lv=ex.level;scr=()=>openEx(id);const R=res[id]||{};
+ app.innerHTML=langBar()+`<button onclick="bank('${lv}')">← ${T('Back','Retour')}</button><h1>${Ls(ex.title)}</h1><div class="card">
+ <p>${T('Three sections, as in the TORFL. No dictionary, no notes. Each section needs about 66% to pass.','Trois sections, comme au TORFL. Ni dictionnaire ni notes. Il faut environ 66 % à chaque section pour réussir.')}</p>`+
+ ['vg','rd','li'].map(s=>`<button class="go" onclick="start('${s}')">${sn(s)} (${ex[SEC[s][2]].length})${R[s]?' · '+sc(R[s]).p+'%':''}</button>`).join('')+
+ (Object.keys(R).length?`<button onclick="results()">${T('See my results','Voir mes résultats')}</button>`:'')+
+ `<p class="mut">${T('Audio: uses mp3 files in audio/ if present, otherwise your browser\'s Russian voice.','Audio : utilise les mp3 du dossier audio/ s\'ils existent, sinon la voix russe du navigateur.')}</p></div>`}
+
+function start(s){sec=s;i=0;cur=[];const d=ex[SEC[s][2]];
+ list=s=='vg'?[...prep(d.filter(x=>x.k=='v')),...prep(d.filter(x=>x.k=='g'))]:s=='rd'?prep(d,false):prep(d);ask()}
+
+function ask(){const it=list[i];plays=2;picked=null;
+ const head=`<div class="bar"><i style="width:${100*i/list.length}%"></i></div><p class="mut">${ex.level} · ${sn(sec)} · ${i+1} / ${list.length}</p>`;
+ let body;
+ if(sec=='vg')body=`<p class="mut">${INS()[it.k]}</p><div class="big">${Ls(it.q)}</div>`;
+ else if(sec=='rd')body=`<div class="txt">${ex.texts[it.t]}</div><p class="mut">${INS()[it.k||'r']}</p><div>${Ls(it.q)}</div>`;
+ else body=`<p class="mut">${Ls(it.q)}</p><button class="go" id="pl">▶ ${T('Play','Écouter')} (<span id="pc">2</span> ${T('left','restantes')})</button>`;
+ app.innerHTML=head+`<div class="card">${body}${it.opts.map((o,k)=>`<button data-k="${k}">${Ls(o.t)}</button>`).join('')}<button class="go" id="nx" disabled>${T('Next','Suivant')} →</button></div>`;
+ app.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{picked=+b.dataset.k;
+  app.querySelectorAll('[data-k]').forEach(x=>x.classList.toggle('sel',x==b));$('nx').disabled=false});
+ $('nx').onclick=()=>{cur.push({it,ok:it.opts[picked].ok,k:it.opts.length});if(++i<list.length)ask();else{(res[ex.id]=res[ex.id]||{})[sec]=cur;results()}};
+ if(sec=='li')$('pl').onclick=()=>{if(!plays)return;plays--;$('pc').textContent=plays;$('pl').disabled=!plays;sayIt(it)}}
+
+// Score corrected for guessing: each wrong answer subtracts 1/(options-1).
+function sc(r){let a=0;r.forEach(x=>a+=x.ok?1:-1/(x.k-1));return{raw:r.filter(x=>x.ok).length,n:r.length,p:Math.max(0,Math.round(100*a/r.length))}}
+function band(p){const L=lv;return p<35?[T('Below ','Sous le niveau ')+L,T('Keep building the basics for this level.','Continuez à consolider les bases de ce niveau.')]
+ :p<66?[T('Working towards ','En progression vers ')+L,T('Below the 66% TORFL pass mark.','Sous le seuil de réussite de 66 % du TORFL.')]
+ :p<80?[L+T(' – borderline pass',' – réussite limite'),T('Around the 66% mark with little margin: test noise could put you on either side.','Autour de 66 %, avec peu de marge : l\'incertitude du test peut jouer dans les deux sens.')]
+ :p<92?[L+T(' – secure',' – acquis'),T('Comfortably above the pass mark.','Nettement au-dessus du seuil de réussite.')]
+ :[L+T(' – very strong',' – très solide'),L=='A1'?T('Try the A2 exams.','Essayez les examens A2.'):T('Consider a B1 practice test.','Envisagez un test d\'entraînement B1.')]}
+
+function results(){scr=results;const R=res[ex.id]||{},S=['vg','rd','li'],done=S.filter(s=>R[s]);let o='';
+ o+=done.length==3?`<div class="card"><b>${T('Overall (weakest section counts)','Global (la section la plus faible compte)')}</b><div class="big">${band(Math.min(...done.map(s=>sc(R[s]).p)))[0]}</div></div>`
+  :`<p class="mut">${T('The overall level appears once all 3 sections are done.','Le niveau global apparaît quand les 3 sections sont terminées.')}</p>`;
+ S.forEach(s=>{
+  if(!R[s]){o+=`<div class="card"><b>${sn(s)}</b><p class="mut">${T('Not taken yet.','Pas encore passée.')}</p><button class="go" onclick="start('${s}')">${T('Start','Commencer')}</button></div>`;return}
+  const r=sc(R[s]),b=band(r.p);
+  const miss=R[s].filter(x=>!x.ok).map(x=>`<li>${s=='li'?x.it.say:Ls(x.it.q)} → <b>${Ls(x.it.opts.find(q=>q.ok).t)}</b></li>`).join('');
+  o+=`<div class="card"><b>${sn(s)}</b><div class="big">${r.p}%</div><p><b>${b[0]}</b><br>${b[1]}</p>
+  <p class="mut">${r.raw}/${r.n} ${T('correct · percentage corrected for guessing','correctes · pourcentage corrigé du hasard')}</p>
+  <details><summary>${T('Review mistakes','Revoir les erreurs')} (${r.n-r.raw})</summary><ul>${miss}</ul></details>
+  <button onclick="start('${s}')">${T('Retake (new random order)','Refaire (nouvel ordre aléatoire)')}</button></div>`});
+ app.innerHTML=langBar()+`<h1>${Ls(ex.title)}</h1>`+o+(done.length?`<button class="go" onclick="cert()">${T('Download certificate (PDF)','Télécharger le certificat (PDF)')}</button>`:'')+`<button onclick="openEx('${ex.id}')">← ${T('Back to exam','Retour à l\'examen')}</button>`}
+
+function cert(){
+ const nm=prompt(T('Name for the certificate (optional):','Nom pour le certificat (facultatif) :'),'')||'';
+ const R=res[ex.id],done=['vg','rd','li'].filter(s=>R[s]);
+ const rows=done.map(s=>{const r=sc(R[s]);return `<tr><td>${sn(s)}</td><td>${r.raw} / ${r.n}</td><td><b>${r.p}%</b></td><td>${band(r.p)[0]}</td></tr>`}).join('');
+ const lvl=done.length==3?band(Math.min(...done.map(s=>sc(R[s]).p)))[0]:T(`Partial result (${done.length}/3 sections)`,`Résultat partiel (${done.length}/3 sections)`);
+ const tf=T(TFN[lv][0],TFN[lv][1]);
+ document.title=`Russian-${lv}-certificate`;
+ app.innerHTML=`<div class="noprint"><button class="go" onclick="print()">${T('Print / Save as PDF','Imprimer / Enregistrer en PDF')}</button><button onclick="results()">← ${T('Back','Retour')}</button>
+ <p class="mut">${T('In the print dialog, choose “Save as PDF” as destination.','Dans la fenêtre d\'impression, choisissez « Enregistrer au format PDF ».')}</p></div>
+ <div class="cert"><div class="mut">${T('Russian language · self-assessment','Langue russe · auto-évaluation')}</div><h1>${T('Placement Test Certificate','Certificat de test de niveau')} – ${lv}</h1>
+ <div class="mut">${Ls(ex.title)}</div>
+ ${nm?`<p>${T('Awarded to','Décerné à')} <b style="font-size:22px">${nm.replace(/</g,'&lt;')}</b></p>`:''}
+ <p>${T('Result','Résultat')} : <b style="font-size:24px">${lvl}</b></p>
+ <table><tr><td><b>${T('Section','Section')}</b></td><td><b>${T('Correct','Correctes')}</b></td><td><b>${T('Score*','Score*')}</b></td><td><b>${T('Band','Niveau')}</b></td></tr>${rows}</table>
+ <div class="mut">${new Date().toLocaleDateString(ui=='fr'?'fr-FR':'en-GB')}</div>
+ <div class="note">${T(`*Corrected for guessing. <b>About this test:</b> AI-generated (Claude, Anthropic), modelled on the structure (vocabulary &amp; grammar, reading, listening), topics and 66% pass mark of the TORFL (ТРКИ) ${tf} level. It is not psychometrically calibrated and omits the writing and speaking subtests: an indicative estimate (about ±8 points), not an official certification.`,
+ `*Corrigé du hasard. <b>À propos de ce test :</b> généré par IA (Claude, Anthropic), inspiré de la structure (lexique et grammaire, lecture, compréhension orale), des thèmes et du seuil de 66 % du TORFL (ТРКИ) niveau ${tf}. Il n'est pas calibré psychométriquement et n'inclut pas l'écrit ni l'oral : une estimation indicative (environ ±8 points), pas une certification officielle.`)}</div></div>`;
+ setTimeout(()=>print(),300)}
+
+window.EXAMS=[];
+(async()=>{for(const f of EXAM_FILES)await new Promise(r=>{const s=document.createElement('script');s.src='exams/'+f+'.js';s.charset='utf-8';s.onload=s.onerror=r;document.head.appendChild(s)});
+ EXAMS.forEach(e=>e.listening.forEach((x,n)=>x.n=n+1));home()})();
+</script></body></html>
