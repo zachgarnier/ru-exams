@@ -1,4 +1,32 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Russian placement tests (TORFL-style)</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Free Russian placement test (A1/A2) — no login</title>
+<meta name="description" content="Free Russian placement tests (A1/A2, TORFL-style). No login, no email, no ads. Multiple choice, English or French, with a printable self-assessment certificate.">
+<link rel="canonical" href="https://zachgarnier.github.io/ru-exams/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Free Russian placement test (A1/A2) — no login">
+<meta property="og:description" content="Free, no-login Russian placement tests with listening, reading and grammar. English or French, plus a printable self-assessment certificate.">
+<meta property="og:url" content="https://zachgarnier.github.io/ru-exams/">
+<meta property="og:image" content="https://zachgarnier.github.io/ru-exams/icons/icon-512.png">
+<meta property="og:image:alt" content="Russian cathedral quiz icon">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="author" content="Zacharie Garnier Cuchet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "Is this Russian test really free?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. No account, no email, no phone number, no ads and no paywall."}},
+    {"@type": "Question", "name": "Is this an official TORFL certificate?", "acceptedAnswer": {"@type": "Answer", "text": "No. It is an unofficial self-assessment modelled on the TORFL. The certificate is a personal record, not an official diploma."}},
+    {"@type": "Question", "name": "Which Russian level should I start with?", "acceptedAnswer": {"@type": "Answer", "text": "Start with A1 unless you already study at A2. If you score 92% or more, try an A2 exam. Your overall level is your weakest section."}},
+    {"@type": "Question", "name": "Do I need to type in Russian?", "acceptedAnswer": {"@type": "Answer", "text": "No. Every answer is multiple choice, so you need no Cyrillic keyboard. You should still recognise basic Cyrillic, because the questions are in Russian."}},
+    {"@type": "Question", "name": "How long does a Russian placement test take?", "acceptedAnswer": {"@type": "Answer", "text": "Roughly 15 to 30 minutes per exam, depending on the level and how often you replay the audio."}},
+    {"@type": "Question", "name": "What does the test cover?", "acceptedAnswer": {"@type": "Answer", "text": "Vocabulary and grammar, reading, and listening. Writing and speaking are not covered."}},
+    {"@type": "Question", "name": "How is the test scored?", "acceptedAnswer": {"@type": "Answer", "text": "Each section is corrected for guessing, and the overall level is your weakest section. About 66% is the TORFL pass mark; 80% or more gives you a safer margin."}},
+    {"@type": "Question", "name": "Can I use the test on my phone?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. It works in a mobile browser, and you can add it to your home screen."}}
+  ]
+}
+</script>
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
@@ -21,6 +49,11 @@ button.go{background:var(--ac);color:#fff;text-align:center;border:0}button:disa
 .big{font-size:28px;margin:6px 0}.mut{color:var(--mut);font-size:14px}
 .bar{height:6px;background:var(--bd);border-radius:3px}.bar i{display:block;height:100%;background:var(--ac);border-radius:3px}
 .txt{background:var(--bg);border-left:3px solid var(--ac);padding:10px 14px;margin:8px 0}
+.about h2{font-size:22px;margin:24px 0 6px}.about h2:first-child{margin-top:0}
+.about p{margin:8px 0}.about ul{padding-left:22px;margin:8px 0}.about li{margin:6px 0}
+.about a{color:var(--ac)}
+.about details{border-top:1px solid var(--bd);padding:9px 0}.about summary{cursor:pointer;font-weight:600}
+.about details p{margin:8px 0 0;color:var(--mut)}
 .cert{background:#fff;color:#111;border:6px double #b3261e;padding:32px;text-align:center}
 .cert table{width:100%;border-collapse:collapse;margin:18px 0}.cert td{border-bottom:1px solid #ccc;padding:8px;font-size:15px}
 .cert .note{font-size:12px;color:#444;text-align:left;border-top:1px solid #ccc;padding-top:10px;margin-top:18px}
@@ -44,11 +77,58 @@ function speak(t){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(
  const v=speechSynthesis.getVoices().find(v=>v.lang.toLowerCase().startsWith('ru'));if(v)u.voice=v;speechSynthesis.speak(u)}
 function sayIt(it){const a=new Audio('audio/'+ex.id+'/'+String(it.n).padStart(2,'0')+'.mp3');a.play().catch(()=>speak(it.say))}
 const langBar=()=>`<div class="lv"><button class="${ui=='en'?'on':''}" onclick="setUi('en')">English</button><button class="${ui=='fr'?'on':''}" onclick="setUi('fr')">Français</button></div>`;
-function setUi(u){ui=u;scr()}
+const ABOUT={
+en:`<section class="card about">
+<h2>Why this site exists</h2>
+<p>I’m <a href="https://zachariegarniercuchet.github.io/" target="_blank" rel="noopener">Zacharie Garnier Cuchet</a>, a French-Canadian AI engineer learning Russian. I built this because I needed a quick, honest way to check my level — and the free tests I found kept asking for an email and phone number, then sent ads. This one is different: <b>free, no login, no email, no ads</b>.</p>
+<p>Take a test, get a score and a printable <b>self-assessment certificate</b> (PDF). The bank keeps growing, with exams in <b>English and French</b>.</p>
+<p>I’m budget-minded: I want to learn Russian for as little as possible, so I’m sharing what works for me.</p>
+<h2>What I use to learn Russian</h2>
+<ul>
+<li><b>Russian Learners’ Dictionary: 10,000 Russian Words in Frequency Order</b> — vocabulary in frequency order.</li>
+<li><b>Méthode 90 — Russe pratique de base</b> — grammar and everyday Russian.</li>
+<li><a href="https://zachgarnier.github.io/Russian-App-Learner/" target="_blank" rel="noopener">Russian App Learner</a> — my own listening and vocabulary practice app.</li>
+<li><a href="https://www.russianforeveryone.com/" target="_blank" rel="noopener">Russian For Everyone</a>, <a href="https://www.russianlessons.net/" target="_blank" rel="noopener">Russian Lessons</a> and <a href="https://masterrussian.com/" target="_blank" rel="noopener">Master Russian</a> — free grammar, reading and listening references.</li>
+<li><a href="https://www.clozemaster.com/" target="_blank" rel="noopener">ClozeMaster</a> — Duolingo-style exercises; the free tier is useful, and the paid version adds more.</li>
+</ul>
+<h2>Questions Russian learners ask</h2>
+<details><summary>Is this test really free?</summary><p>Yes. No account, no email, no phone number, no ads and no paywall.</p></details>
+<details><summary>Is this an official TORFL certificate?</summary><p>No. It is an unofficial self-assessment modelled on the TORFL. The certificate is a personal record, not an official diploma.</p></details>
+<details><summary>Which level should I start with?</summary><p>Start with A1 unless you already study at A2. If you score 92% or more, try an A2 exam. Your overall level is your weakest section.</p></details>
+<details><summary>Do I need to type in Russian?</summary><p>No. Every answer is multiple choice, so you need no Cyrillic keyboard. You should still recognise basic Cyrillic, because the questions are in Russian.</p></details>
+<details><summary>How long does a test take?</summary><p>Roughly 15–30 minutes per exam, depending on the level and how often you replay the audio.</p></details>
+<details><summary>What does it test?</summary><p>Vocabulary and grammar, reading, and listening. Writing and speaking are not covered.</p></details>
+<details><summary>How is it scored?</summary><p>Each section is corrected for guessing, and the overall level is your weakest section. About 66% is the TORFL pass mark; 80% or more gives you a safer margin.</p></details>
+<details><summary>Can I use it on my phone?</summary><p>Yes. It works in a mobile browser, and you can add it to your home screen (in Safari: Share → Add to Home Screen).</p></details>
+</section>`,
+fr:`<section class="card about">
+<h2>Pourquoi ce site existe</h2>
+<p>Je suis <a href="https://zachariegarniercuchet.github.io/" target="_blank" rel="noopener">Zacharie Garnier Cuchet</a>, ingénieur en IA franco-canadien et j’apprends le russe. J’ai créé ce site parce que je voulais un moyen rapide et honnête d’évaluer mon niveau — et les tests gratuits que je trouvais demandaient sans cesse un courriel et un numéro de téléphone, avant d’envoyer de la publicité. Celui-ci est différent : <b>gratuit, sans compte, sans courriel, sans publicité</b>.</p>
+<p>Passez un test, obtenez un score et un <b>certificat d’auto-évaluation</b> imprimable (PDF). La banque s’agrandit, avec des examens en <b>anglais et en français</b>.</p>
+<p>Je suis économe : je veux apprendre le russe pour le moins cher possible, alors je partage ce qui fonctionne pour moi.</p>
+<h2>Ce que j’utilise pour apprendre le russe</h2>
+<ul>
+<li><b>Russian Learners’ Dictionary: 10,000 Russian Words in Frequency Order</b> — le vocabulaire classé par fréquence.</li>
+<li><b>Méthode 90 — Russe pratique de base</b> — la grammaire et le russe du quotidien.</li>
+<li><a href="https://zachgarnier.github.io/Russian-App-Learner/" target="_blank" rel="noopener">Russian App Learner</a> — mon application d’écoute et de vocabulaire.</li>
+<li><a href="https://www.russianforeveryone.com/" target="_blank" rel="noopener">Russian For Everyone</a>, <a href="https://www.russianlessons.net/" target="_blank" rel="noopener">Russian Lessons</a> et <a href="https://masterrussian.com/" target="_blank" rel="noopener">Master Russian</a> — des références gratuites de grammaire, de lecture et d’écoute.</li>
+<li><a href="https://www.clozemaster.com/" target="_blank" rel="noopener">ClozeMaster</a> — des exercices à la Duolingo ; la version gratuite est utile et la version payante ajoute des exercices.</li>
+</ul>
+<h2>Questions que se posent les apprenants de russe</h2>
+<details><summary>Ce test est-il vraiment gratuit ?</summary><p>Oui. Sans compte, sans courriel, sans numéro de téléphone, sans publicité et sans paywall.</p></details>
+<details><summary>Est-ce un certificat TORFL officiel ?</summary><p>Non. C’est une auto-évaluation non officielle inspirée du TORFL. Le certificat est un document personnel, pas un diplôme officiel.</p></details>
+<details><summary>Par quel niveau commencer ?</summary><p>Commencez par le A1, sauf si vous étudiez déjà au niveau A2. Si vous obtenez 92 % ou plus, essayez un examen A2. Le niveau global correspond à votre section la plus faible.</p></details>
+<details><summary>Faut-il taper en russe ?</summary><p>Non. Toutes les réponses sont des QCM : aucun clavier cyrillique nécessaire. Il faut toutefois reconnaître le cyrillique de base, car les questions sont en russe.</p></details>
+<details><summary>Combien de temps dure un test ?</summary><p>Environ 15 à 30 minutes par examen, selon le niveau et le nombre de réécoutes.</p></details>
+<details><summary>Que teste-t-il ?</summary><p>Le lexique et la grammaire, la lecture et la compréhension orale. L’écrit et l’oral ne sont pas couverts.</p></details>
+<details><summary>Comment est-il noté ?</summary><p>Chaque section est corrigée du hasard et le niveau global correspond à la section la plus faible. Le seuil du TORFL est d’environ 66 % ; 80 % ou plus vous laisse une marge plus sûre.</p></details>
+<details><summary>Puis-je l’utiliser sur mon téléphone ?</summary><p>Oui. Il fonctionne dans un navigateur mobile et vous pouvez l’ajouter à l’écran d’accueil (dans Safari : Partager → Sur l’écran d’accueil).</p></details>
+</section>`};
+function setUi(u){ui=u;document.documentElement.lang=u;scr()}
 
-function home(){scr=home;app.innerHTML=langBar()+`<h1>${T('Russian placement tests','Tests de niveau de russe')}</h1>
+function home(){scr=home;document.title=T('Free Russian placement test (A1/A2) — no login','Test de niveau de russe gratuit (A1/A2) — sans compte');app.innerHTML=langBar()+`<h1>${T('Russian placement tests','Tests de niveau de russe')}</h1>
 <p class="mut">${T('Modelled on the TORFL (ТРКИ). Multiple choice only: no typing, no Cyrillic keyboard needed.','Inspirés du TORFL (ТРКИ). QCM uniquement : aucune saisie, pas besoin de clavier cyrillique.')}</p>
-<div class="card"><button class="go" onclick="bank('A1')">A1 · ${T('Elementary','Élémentaire')} (ТЭУ)</button><button class="go" onclick="bank('A2')">A2 · ${T('Basic','Basique')} (ТБУ)</button></div>`}
+<div class="card"><button class="go" onclick="bank('A1')">A1 · ${T('Elementary','Élémentaire')} (ТЭУ)</button><button class="go" onclick="bank('A2')">A2 · ${T('Basic','Basique')} (ТБУ)</button></div>${ABOUT[ui]}`}
 
 function bank(l){lv=l;scr=()=>bank(l);const xs=EXAMS.filter(e=>e.level==l);
  app.innerHTML=langBar()+`<button onclick="home()">← ${T('Back','Retour')}</button><h1>${l} · ${T(TFN[l][0],TFN[l][1])}</h1>`+
